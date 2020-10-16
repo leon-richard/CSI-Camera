@@ -1,10 +1,3 @@
-# MIT License
-# Copyright (c) 2019 JetsonHacks
-# See license
-# Using a CSI camera (such as the Raspberry Pi Version 2) connected to a
-# NVIDIA Jetson Nano Developer Kit using OpenCV
-# Drivers for the camera and OpenCV are included in the base image
-
 import cv2
 
 # gstreamer_pipeline returns a GStreamer pipeline for capturing from the CSI camera
@@ -41,27 +34,19 @@ def gstreamer_pipeline(
     )
 
 
-def show_camera():
+def take_picture():
     # To flip the image, modify the flip_method parameter (0 and 2 are the most common)
-    pipeline = gstreamer_pipeline(flip_method=0, capture_width=3264, capture_height=1848, framerate=28)
+    pipeline = gstreamer_pipeline(
+        flip_method=0, capture_width=3264, capture_height=1848, framerate=28)
     print(pipeline)
     cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
     if cap.isOpened():
-        window_handle = cv2.namedWindow("CSI Camera", cv2.WINDOW_AUTOSIZE)
-        # Window
-        while cv2.getWindowProperty("CSI Camera", 0) >= 0:
-            ret_val, img = cap.read()
-            cv2.imshow("CSI Camera", img)
-            # This also acts as
-            keyCode = cv2.waitKey(30) & 0xFF
-            # Stop the program on the ESC key
-            if keyCode == 27:
-                break
+        ret_val, img = cap.read()
+        cv2.imwrite("Picture.png", img)
         cap.release()
-        cv2.destroyAllWindows()
     else:
         print("Unable to open camera")
 
 
 if __name__ == "__main__":
-    show_camera()
+    take_picture()
